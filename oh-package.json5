@@ -1,0 +1,10 @@
+{
+  "name": "ez_rdbstore",
+  "version": "1.0.0",
+  "description": "doc: https://bytedance.larkoffice.com/wiki/H3VrwZt8WirxdhkIxNdcFJs0nNg",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+  }
+}

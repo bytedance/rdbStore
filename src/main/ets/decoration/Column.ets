@@ -1,0 +1,79 @@
+import { PropertyConverter } from '../model/relation/converter/ConvertParameter';
+import { RdbConst } from '../RdbConst';
+import { ClassConstructor } from '../util/ClassConstructor';
+import { ColumnType } from './ColumnType';
+
+/**
+ * 列注解处理
+ * @param v
+ * @returns
+ */
+export function Columns(info: ColumnInfo): PropertyDecorator {
+  return (target: object, propertyKey) => {
+    const columnMeta: object = target[RdbConst.COLUMN] ?? new Object
+    if ((typeof propertyKey === 'string')) {
+      columnMeta[propertyKey] = info
+    }
+    target[RdbConst.COLUMN] = columnMeta
+  };
+}
+
+/**
+ * 列信息
+ */
+export interface ColumnInfo {
+  /**
+   * 列名
+   */
+  name: string
+  /**
+   * 列类型
+   */
+  type: ColumnType
+  /**
+   * 是否是主键
+   */
+  isPrimaryKey?: boolean
+  /**
+   * 是否自增
+   */
+  autoincrement?: boolean
+  /**
+   * 唯一性约束：是否唯一，插入等会进行校验
+   */
+  unique?: boolean
+  /**
+   * 非空约束
+   */
+  notNull?: boolean
+  /**
+   * 类型转换器，业务类型 <> Db 类型
+   */
+  convertor?: ClassConstructor<PropertyConverter<Object, Object>>
+}
+
+/**
+ * model number, 存储按 string 存储
+ */
+export class NumToStringConvertor extends PropertyConverter<number, string> {
+  convertToEntityProperty(databaseValue: string): number {
+    return Number(databaseValue);
+  }
+
+  convertToDatabaseValue(entityProperty: number): string {
+    return entityProperty.toString()
+  }
+}
+
+/**
+ * model bigint, 存储按 string 存储
+ */
+export class BigIntToStringConvertor extends PropertyConverter<bigint, string> {
+  convertToEntityProperty(databaseValue: string): bigint {
+    return BigInt(databaseValue);
+  }
+
+  convertToDatabaseValue(entityProperty: bigint): string {
+    return entityProperty.toString()
+  }
+}
