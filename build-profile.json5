@@ -1,31 +1,45 @@
 {
-  "apiType": "stageMode",
-  "buildOption": {
+  "app": {
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
   },
-  "buildOptionSet": [
+  "modules": [
     {
-      "name": "release",
-      "arkOptions": {
-        "obfuscation": {
-          "ruleOptions": {
-            "enable": true,
-            "files": [
-              "./obfuscation-rules.txt"
-            ]
-          },
-          "consumerFiles": [
-            "./consumer-rules.txt"
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
           ]
         }
-      },
-    },
-  ],
-  "targets": [
-    {
-      "name": "default"
+      ]
     },
     {
-      "name": "ohosTest"
+      "name": "rdbstore",
+      "srcPath": "./rdbstore",
     }
   ]
 }

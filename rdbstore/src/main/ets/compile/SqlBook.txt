@@ -1,0 +1,153 @@
+
+1 数据库创建
+* 单主键情况：
+CREATE TABLE your_table_name (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+email VARCHAR(200) UNIQUE NOT NULL,
+age INT NOT NULL
+);
+
+* 多主键情况：
+CREATE TABLE your_table_name (
+  column1 INT,
+column2 VARCHAR(50),
+column3 DATE,
+PRIMARY KEY (column1, column2)
+);
+
+* 删除表
+DROP TABLE table_name;
+
+* 删除列
+ALTER TABLE table_name DROP COLUMN column_name;
+
+* 增加列
+ALTER TABLE table_name ADD new_column_name data_type UNIQUE NOT NULL;
+
+* 普通索引
+CREATE INDEX IF NOT EXISTS index_name ON table_name (column1, column2);
+
+* 唯一性索引
+CREATE UNIQUE INDEX IF NOT EXISTS unique_index_name ON table_name (column1, column2);
+
+* 删除索引
+DROP INDEX index_name;
+
+
+2 查询
+
+* 谓词查询
+SELECT *
+FROM your_table
+WHERE column1 > 10
+AND column2 LIKE '%value%'
+OR column3 IN (1, 2, 3)
+AND NOT column4 = 5
+AND (column5 BETWEEN 10 AND 20)
+ORDER BY column7 DESC
+LIMIT 10;
+
+3 聚合函数
+-- 计算所有订单金额的总和
+SELECT SUM(order_amount) AS total_amount
+FROM orders;
+
+-- 计算订单数量
+SELECT COUNT(*) AS order_count
+FROM orders;
+
+-- 计算平均订单金额
+SELECT AVG(order_amount) AS average_amount
+FROM orders;
+
+-- 找出订单金额的最大值
+SELECT MAX(order_amount) AS max_amount
+FROM orders;
+
+-- 找出订单金额的最小值
+SELECT MIN(order_amount) AS min_amount
+FROM orders;
+
+SELECT category, SUM(price) AS total_price
+FROM products
+GROUP BY category;
+
+SELECT year(birth_date), COUNT(*) AS count
+FROM customers
+GROUP BY year(birth_date);
+
+SELECT category, SUM(price) AS total_price
+FROM products
+GROUP BY category
+HAVING SUM(price) > 1000;
+
+4 运维能力
+
+* 所有表
+SELECT name FROM sqlite_master WHERE type = "table"
+
+* 所有列
+PRAGMA table_info(table_name)
+
+* 表中所有的列创建语句
+SELECT * FROM sqlite_master WHERE type="table" AND name="NOTE"
+
+* 表中所有的索引
+SELECT * FROM sqlite_master WHERE type = "index" AND tbl_name = "NOTE"
+
+5 品质优化
+
+* 参数配置类
+PRAGMA page_size=4096;    /* default page size : 4k */
+PRAGMA journal_mode=WAL
+PRAGMA synchronous=FULL
+PRAGMA journal_size_limit=1024 * 1024; DB_JOURNAL_SIZE = 1024 * 1024; /* default file size : 1M */
+PRAGMA wal_autocheckpoint=WAL_AUTO_CHECKPOINT = 100;  /* 100 pages */
+PRAGMA foreign_keys = ON
+PRAGMA recursive_triggers = ON
+PRAGMA codec_hmac_algo=sha256
+PRAGMA cipher_default_attach_kdf_iter=5000
+PRAGMA codec_rekey_hmac_algo=SHA256
+
+* 操作类
+PRAGMA shrink_memory
+PRAGMA integrity_check
+PRAGMA quick_check(0)
+PRAGMA table_info(tablename)
+PRAGMA index_list(tablename)
+
+6 拉取数据库文件到桌面
+./hdc file recv /data/app/el2/100/database/com.ss.xx.xx.xxx/rdb   /Users/bytedance/Desktop
+
+7 联接
+INNER JOIN：两表中公共交集部分的所有行
+LEFT JOIN：即使右表中没有匹配，也从左表返回所有的行
+RIGHT JOIN：即使左表中没有匹配，也从右表返回所有的行
+
+多表 join 行中没有值的列返回为 NULL
+
+left join：
+SELECT Websites.name, access_log.count, access_log.date
+FROM Websites
+LEFT JOIN access_log
+ON Websites.id=access_log.site_id
+ORDER BY access_log.count DESC;
+
+right join：
+SELECT websites.name, access_log.count, access_log.date
+FROM websites
+RIGHT JOIN access_log
+ON access_log.site_id=websites.id
+ORDER BY access_log.count DESC;
+
+union:
+union: 多个查询结果取并集
+union 操作符默认会去除重复的记录，如果需要保留所有重复记录，使用 UNION ALL
+
+SELECT country, name FROM Websites
+WHERE country='CN'
+UNION ALL
+SELECT country, app_name FROM apps
+WHERE country='CN'
+ORDER BY country;
