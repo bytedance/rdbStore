@@ -142,9 +142,7 @@ it('update', 0, async (done: Function) => {
 RdbDao#predicatesBuilder 复杂查询通过 builder 构建  
 RdbDao#queryPredicate 通过传入谓词来查询且解析为对应 model  
 RdbDao#querySync 同步进行查询且解析为对应 model  
-RdbDao#querySql Sql 语句查询且解析为对应 model  
-RdbDao#queryRawSqlSync 同步执行 sql 返回原始数据结果待解析  
-RdbDao#queryRawSql query sql 执行，返回原始数据结果待解析  
+RdbDao#querySql Sql 语句查询且解析为对应 model
 PredicatesBuilder#where 构建查询谓词
 
 代码示范：
