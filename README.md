@@ -199,7 +199,7 @@ TuneDbParamPlugin#setJournalSizeLimit
 
 > 推荐开启自动升级，之后只需要修改版本号即可，无需手写 Migration
 
-通过配置 migration 进行升级
+若仍想手动升级，可以通过配置 migration 进行升级
 
 ```
 const migration1_2 = new Migration(1, 2).addColumn('table_x', 'column_x', ColumnType.TEXT)
