@@ -469,6 +469,22 @@ export class RdbDao<Entity extends object> {
   }
 
   /**
+   * 开启事务
+   */
+  async beginTransaction() {
+    const db = await this.database.getRdbImpl()
+    db.beginTransaction()
+  }
+
+  /**
+   * 提交事务
+   */
+  async commit() {
+    const db = await this.database.getRdbImpl()
+    db.commit()
+  }
+
+  /**
    * 获取所有表索引
    */
   async getAllIndex(): Promise<Array<string>> {

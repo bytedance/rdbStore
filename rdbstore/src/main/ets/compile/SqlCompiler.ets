@@ -157,6 +157,7 @@ export namespace SqlCompiler {
         re.push(resultToModel(entityCls, resultSet))
       } while (resultSet.goToNextRow());
     }
+    resultSet.close()
     return re
   }
 
