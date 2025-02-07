@@ -69,6 +69,19 @@ export interface ColumnInfo {
 }
 
 /**
+ * model string, 存储按 integer 存储
+ */
+export class BigIntStrConvertor extends PropertyConverter<string, bigint> {
+  convertToEntityProperty(databaseValue: bigint): string {
+    return databaseValue.toString();
+  }
+
+  convertToDatabaseValue(entityProperty: string): bigint {
+    return BigInt(entityProperty)
+  }
+}
+
+/**
  * model number, 存储按 string 存储
  */
 export class NumToStringConvertor extends PropertyConverter<number, string> {
@@ -91,5 +104,18 @@ export class BigIntToStringConvertor extends PropertyConverter<bigint, string> {
 
   convertToDatabaseValue(entityProperty: bigint): string {
     return entityProperty.toString()
+  }
+}
+
+/**
+ * model bigint, 存储按 integer 存储
+ */
+export class BigIntConvertor extends PropertyConverter<bigint, bigint> {
+  convertToEntityProperty(databaseValue: bigint): bigint {
+    return BigInt(databaseValue);
+  }
+
+  convertToDatabaseValue(entityProperty: bigint): bigint {
+    return entityProperty
   }
 }
