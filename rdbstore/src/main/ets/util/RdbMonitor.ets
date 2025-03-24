@@ -99,11 +99,12 @@ export class RdbMonitor {
   /**
    * 上报数据库异常
    */
-  reportError(msg: Rdb.ErrorMsg, err: Error) {
+  reportError(msg: Rdb.ErrorMsg, appendParam?: Callback<Record<string, EventParamsBaseType>>, err?: Error) {
     const param: Record<string, EventParamsBaseType> = {}
     param[EventConstants.SCENE_NAME] = EventConstants.ERROR_SCENE
-    param[EventConstants.ERROR_NAME] = err.name
-    param[EventConstants.ERROR_MSG] = `${msg.toString()} detail: ${err.message}`
+    param[EventConstants.ERROR_NAME] = err?.name ?? ''
+    param[EventConstants.ERROR_MSG] = `${msg.toString()} detail: ${err?.message}`
+    appendParam?.(param)
     this.extension.log?.i(EventConstants.RDB_MONITOR, JSON.stringify(param))
     this.extension.eventSender?.send(EventConstants.RDB_MONITOR, param)
   }

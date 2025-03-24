@@ -54,6 +54,17 @@ export class RdbDatabase {
   }
 
   /**
+   * 初始化完成
+   * @returns
+   */
+  private initDone(): boolean {
+    if (this.dbImpl) {
+      return true
+    }
+    return false
+  }
+
+  /**
    * 数据库的初始化
    */
   private async init(): Promise<boolean> {
@@ -62,11 +73,18 @@ export class RdbDatabase {
         if (this.initDone()) {
           resolve(true)
         }
-        this.extension.log?.i(this.tag, `init`)
-        this.dbImpl = new RdbWrapper(await this.getDbInstance(), this.monitor, this.extension)
-        this.extension.log?.i(this.tag, `init finish`)
-        if (this.dbImpl) {
-          resolve(true)
+        try {
+          this.extension.log?.i(this.tag, `init`)
+          const dbInstance = await this.getDbInstance()
+          this.dbImpl = new RdbWrapper(dbInstance, this.monitor, this.extension, this)
+          this.extension.log?.i(this.tag, `init finish`)
+          if (this.dbImpl) {
+            resolve(true)
+          }
+          this.extension.openListener?.onOpen(this)
+        } catch (e) {
+          this.monitor.reportError(Rdb.ErrorMsg.INIT_ERROR, undefined, e)
+          resolve(false)
         }
       })
     }
@@ -98,17 +116,6 @@ export class RdbDatabase {
    */
   get allDao(): IterableIterator<RdbDao<object>> {
     return this.daoMap.values()
-  }
-
-  /**
-   * 初始化完成
-   * @returns
-   */
-  private initDone(): boolean {
-    if (this.dbImpl) {
-      return true
-    }
-    return false
   }
 
   /**
@@ -160,11 +167,30 @@ export class RdbDatabase {
   }
 
   /**
+   * 获取原生 db 实例
+   * 不对 raw rdb 调用 close，调用 close
+   */
+  async getRawRdb(): Promise<relationalStore.RdbStore> {
+    await this.initTask
+    const rdb = await this.dbImpl!.ensureDbOpen()
+    return rdb
+  }
+
+  /**
+   * 关闭数据库，无需手动打开，调用 getRdbImpl 内部会判断状态重新打开
+   */
+  async close() {
+    const rdbWrapper = this.getRdbImplSync()
+    await rdbWrapper.close()
+  }
+
+  /**
    * 数据库实例
    * @returns
    */
-  async getRdbImpl() {
+  async getRdbImpl(): Promise<RdbWrapper> {
     await this.initTask
+    await this.dbImpl?.ensureDbOpen()
     return this.dbImpl!
   }
 
@@ -172,7 +198,7 @@ export class RdbDatabase {
    * 数据库实例 同步获取
    * @returns
    */
-  getRdbImplSync() {
+  getRdbImplSync(): RdbWrapper {
     if (!this.dbImpl) {
       this.extension.log?.e(this.tag, Rdb.ErrorMsg.INIT_ERROR)
       throw new RdbError(Rdb.ErrorMsg.INIT_ERROR, undefined, this.monitor)
@@ -187,6 +213,7 @@ export class RdbDatabase {
   async getAllTable(): Promise<Array<string>> {
     const tables: Array<string> = new Array
     await this.initTask
+    await this.dbImpl?.ensureDbOpen()
     const result =
       await this.dbImpl?.querySql('SELECT name FROM sqlite_master WHERE type = "table" AND name NOT LIKE "sqlite_%" ')
     if (result) {

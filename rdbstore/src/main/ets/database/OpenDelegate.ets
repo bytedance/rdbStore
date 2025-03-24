@@ -36,6 +36,10 @@ export class OpenDelegate implements IOpenDelegate {
     this.migrationHelper = new MigrationContainer(this.database.extension)
   }
 
+  onOpen(database: RdbDatabase): Promise<boolean> {
+    return Promise.resolve(true)
+  }
+
   onConfig(database: RdbDatabase, version: number): Promise<boolean> {
 
     try {

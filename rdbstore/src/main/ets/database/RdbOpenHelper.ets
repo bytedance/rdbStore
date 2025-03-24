@@ -120,25 +120,24 @@ export class RdbOpenHelper {
   }
 
   async onConfig(database: RdbDatabase, version: number) {
-    await database.extension.openListener?.onConfig(database, version)
     await this.openDelegate.onConfig(database, version);
+    await database.extension.openListener?.onConfig(database, version)
   }
 
   async onDowngrade(db: relationalStore.RdbStore, database: RdbDatabase) {
-    await database.extension.openListener?.onDowngrade(db, database);
     await this.openDelegate.onDowngrade(db, database);
+    await database.extension.openListener?.onDowngrade(db, database);
   }
 
   async onUpgrade(db: relationalStore.RdbStore, database: RdbDatabase, version: number, newVersion: number) {
-    await database.extension.openListener?.onUpgrade(db, database, version, newVersion)
     await this.openDelegate.onUpgrade(db, database, version, newVersion)
+    await database.extension.openListener?.onUpgrade(db, database, version, newVersion)
   }
 
   async onCreate(db: relationalStore.RdbStore, database: RdbDatabase) {
-    await database.extension.openListener?.onCreate(db, database)
     await this.openDelegate.onCreate(db, database)
+    await database.extension.openListener?.onCreate(db, database)
   }
-
 
   /**
    * 数据库原生实现
@@ -146,8 +145,20 @@ export class RdbOpenHelper {
    */
   private async getRawRdbStore(): Promise<relationalStore.RdbStore> {
     if (!this.database.config) {
-      throw new RdbError(Rdb.ErrorMsg.INIT_ERROR, undefined, this.database.monitor)
+      throw new RdbError(Rdb.ErrorMsg.INIT_ERROR, undefined, this.database.monitor, (param) => {
+        param[EventConstants.ERROR_MSG] = 'getRawRdbStore config undefined error'
+      })
     }
-    return relationalStore.getRdbStore(this.database.context, this.database.storeConfig);
+
+    let dmImpl: relationalStore.RdbStore | undefined = undefined
+
+    try {
+      dmImpl = await relationalStore.getRdbStore(this.database.context, this.database.storeConfig);
+    } catch (e) {
+      // db 打开失败
+      throw new RdbError(Rdb.ErrorMsg.INIT_ERROR, e, this.database.monitor)
+    }
+
+    return Promise.resolve(dmImpl!)
   }
 }

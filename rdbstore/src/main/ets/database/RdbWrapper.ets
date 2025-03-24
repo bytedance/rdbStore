@@ -18,19 +18,23 @@ import relationalStore from '@ohos.data.relationalStore'
 import { AsyncCallback } from '@kit.BasicServicesKit'
 import { Extension } from '../extension/Extension'
 import { RdbMonitor } from '../util/RdbMonitor'
+import { RdbDatabase } from './RdbDatabase'
 
 /**
- * 封装所有涉及使用原始 db 进行的操作
+ * 封装涉及原始 db 的操作
  */
 export class RdbWrapper {
-  private readonly dbImpl: relationalStore.RdbStore
+  private dbImpl: relationalStore.RdbStore
   private readonly monitor: RdbMonitor
   private readonly extension: Extension
+  private closed: boolean = false
+  private rdbDatabase: RdbDatabase
 
-  constructor(db: relationalStore.RdbStore, monitor: RdbMonitor, extension: Extension) {
+  constructor(db: relationalStore.RdbStore, monitor: RdbMonitor, extension: Extension, database: RdbDatabase) {
     this.dbImpl = db
     this.monitor = monitor
     this.extension = extension
+    this.rdbDatabase = database
   }
 
   beginTransaction() {
@@ -53,8 +57,14 @@ export class RdbWrapper {
     return this.dbImpl.restore(srcName, callback)
   }
 
-  close(): Promise<void> {
-    return this.dbImpl.close()
+  async close(): Promise<void> {
+    if (this.closed == false) {
+      await this.dbImpl.close()
+    }
+
+    this.closed = true
+
+    return Promise.resolve()
   }
 
   async getModifyTime(table: string, columnName: string,
@@ -143,5 +153,18 @@ export class RdbWrapper {
     const result = this.dbImpl.executeSync(sql, args)
     this.monitor.eventQuery(sql, startTime, table)
     return result
+  }
+
+  /**
+   * 保证 Db 打开
+   * @returns
+   */
+  async ensureDbOpen() {
+    // 已经关闭，重新获取数据库实例
+    if (this.closed) {
+      this.dbImpl = await relationalStore.getRdbStore(this.rdbDatabase.context, this.rdbDatabase.storeConfig)
+      this.closed = false
+    }
+    return this.dbImpl
   }
 }
