@@ -21,3 +21,7 @@ rdbStore 数据库组件：以 DTO 方式来便捷操作数据库。
 ## 1.0.3
 
 * 提供 useNormalizedOHMUrl false 版本
+
+## 1.0.4
+
+* builder 中增加派发入口
