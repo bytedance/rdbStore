@@ -18,6 +18,7 @@ import { Extension } from '../extension/Extension';
 import { IEventSender } from '../extension/IEventSender';
 import { ILog } from '../extension/ILog';
 import { TuneDbParamPlugin } from '../extension/TuneDbParamPlugin';
+import { IOpenDelegate } from './IOpenDelegate';
 import { RdbConfig } from './RdbConfig';
 import { RdbDatabase } from './RdbDatabase';
 
@@ -62,6 +63,14 @@ export class DatabaseBuilder {
    */
   setTuneParamPlugin(dbParamTuner: TuneDbParamPlugin): DatabaseBuilder {
     this.extension.tuneDbParamOptPlugin = dbParamTuner
+    return this
+  }
+
+  /**
+   * 增加 db 生命周期派发
+   */
+  setLifecycleListener(openListener: IOpenDelegate): DatabaseBuilder {
+    this.extension.openListener = openListener
     return this
   }
 }
