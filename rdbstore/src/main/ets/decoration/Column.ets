@@ -69,6 +69,19 @@ export interface ColumnInfo {
 }
 
 /**
+ * model boolean，存储按 number 存储
+ */
+export class BoolToNumConvertor extends PropertyConverter<boolean, number> {
+  convertToEntityProperty(databaseValue: number): boolean {
+    return databaseValue == 1
+  }
+
+  convertToDatabaseValue(entityProperty: boolean): number {
+    return entityProperty ? 1 : 0
+  }
+}
+
+/**
  * model string, 存储按 integer 存储
  */
 export class BigIntStrConvertor extends PropertyConverter<string, bigint> {
