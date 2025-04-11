@@ -96,11 +96,13 @@ export namespace Weave {
 
     // 处理当前结点的所有子结点
     for (const child of props) {
-      const param: EmbeddedInfo<Object> =
-        entityCls.prototype[RdbConst.EMBEDDED] ? entityCls.prototype[RdbConst.EMBEDDED][child] : undefined
-      const prefix = param?.prefix ?? '';
-      const targetClass = param?.targetClass ?? entityCls;
-      depthTraversal(propArray, targetClass, child, prefix, table, parentChain);
+      if (!ignoreNode(entityCls, child)) {
+        const param: EmbeddedInfo<Object> =
+          entityCls.prototype[RdbConst.EMBEDDED] ? entityCls.prototype[RdbConst.EMBEDDED][child] : undefined
+        const prefix = param?.prefix ?? '';
+        const targetClass = param?.targetClass ?? entityCls;
+        depthTraversal(propArray, targetClass, child, prefix, table, parentChain);
+      }
     }
 
     if (propName) {
@@ -108,12 +110,29 @@ export namespace Weave {
     }
   }
 
+  /**
+   * 不带有列信息的节点
+   */
+  function ignoreNode(entityCls: ClassConstructor<Object>, propName: string) {
+    if (propName) {
+      const columnInfo: ColumnInfo = entityCls.prototype[RdbConst.COLUMN] ? entityCls.prototype[RdbConst.COLUMN][propName] : undefined
+      const embedded: EmbeddedInfo<Object> = entityCls.prototype[RdbConst.EMBEDDED] ? entityCls.prototype[RdbConst.EMBEDDED][propName] : undefined
+      if (!columnInfo && !embedded) {
+        return true
+      }
+    }
+    return false
+  }
+
 
   /**
    * 是否叶子结点
    */
   function isLeafNode(entityCls: ClassConstructor<Object>, propName: string): boolean {
-    return (entityCls.prototype[RdbConst.COLUMN] ? entityCls.prototype[RdbConst.COLUMN][propName] : undefined)
+    if (entityCls.prototype[RdbConst.COLUMN] && entityCls.prototype[RdbConst.COLUMN][propName]) {
+      return true
+    }
+    return false
   }
 
   /**
