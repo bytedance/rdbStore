@@ -69,6 +69,32 @@ export interface ColumnInfo {
 }
 
 /**
+ * model 自定义对象，存储按 string 存储
+ */
+export class ObjectToStrConvertor<T> extends PropertyConverter<T, string> {
+  convertToEntityProperty(databaseValue: string): T {
+    return JSON.parse(databaseValue)
+  }
+
+  convertToDatabaseValue(entityProperty: T): string {
+    return JSON.stringify(entityProperty)
+  }
+}
+
+/**
+ * model boolean，存储按 number 存储
+ */
+export class BoolToNumConvertor extends PropertyConverter<boolean, number> {
+  convertToEntityProperty(databaseValue: number): boolean {
+    return databaseValue == 1
+  }
+
+  convertToDatabaseValue(entityProperty: boolean): number {
+    return entityProperty ? 1 : 0
+  }
+}
+
+/**
  * model string, 存储按 integer 存储
  */
 export class BigIntStrConvertor extends PropertyConverter<string, bigint> {
