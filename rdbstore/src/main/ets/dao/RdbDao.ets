@@ -66,7 +66,7 @@ export class RdbDao<Entity extends object> {
    * notice：entity 中主键的字段需要有值
    */
   public async update(entity: Entity,
-    conflictResolution: relationalStore.ConflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE): Promise<void> {
+    conflictResolution: relationalStore.ConflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE): Promise<number> {
 
 
     const db = await this.database.getRdbImpl()
@@ -79,14 +79,15 @@ export class RdbDao<Entity extends object> {
       const values: relationalStore.ValuesBucket = SqlCompiler.modelToValuesBucket(this.entityCls, entity)
       const predicates: relationalStore.RdbPredicates = this.getPredicatesByKey(entity)
 
-      await db.update(values, predicates, conflictResolution)
+      const result = await db.update(values, predicates, conflictResolution)
 
       db.commit();
+
+      return result
 
     } catch (e) {
       this.database.extension.log?.e(this.TAG, "update err_msg:" + e.message + "--err:" + e.stack)
       db.rollBack()
-
       throw new RdbError(Rdb.ErrorMsg.PROCESS_ERROR, e, this.database.monitor)
     }
   }
@@ -105,7 +106,7 @@ export class RdbDao<Entity extends object> {
    * 根据主键来匹配更新
    */
   public async updatePartial(values: relationalStore.ValuesBucket, entity: Entity,
-    conflictResolution: relationalStore.ConflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE): Promise<void> {
+    conflictResolution: relationalStore.ConflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE): Promise<number> {
 
     const db = await this.database.getRdbImpl()
 
@@ -115,9 +116,11 @@ export class RdbDao<Entity extends object> {
 
       const predicates: relationalStore.RdbPredicates = this.getPredicatesByKey(entity)
 
-      await db.update(values, predicates, conflictResolution)
+      const result = await db.update(values, predicates, conflictResolution)
 
       db.commit();
+
+      return result
 
     } catch (e) {
       this.database.extension.log?.e(this.TAG, "update err_msg:" + e.message + "--err:" + e.stack)

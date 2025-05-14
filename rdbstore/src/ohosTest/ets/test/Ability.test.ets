@@ -226,7 +226,7 @@ export default function abilityTest() {
 
       model.bigId = 3n
       model.child.name = 'j'
-      await dao.update(model)
+      const result = await dao.update(model)
       const dbValue = await dao.queryPredicate(dao.getPredicatesByKey(model))
       expect(dbValue.length).assertEqual(1)
       expect(dbValue[0].bigId).assertEqual(3n)
