@@ -80,6 +80,10 @@ export class SampleEntity {
     targetClass: Child
   })
   child: Child = new Child()
+
+  paramInt: number = 1
+
+  child2: Child = new Child()
 }
 
 
