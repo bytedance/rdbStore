@@ -305,7 +305,16 @@ export class RdbDao<Entity extends object> {
   public async batchInsert(entities: Array<Entity>,
     conflict: relationalStore.ConflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE): Promise<number> {
     const db = await this.database.getRdbImpl()
-    return await db.batchInsert(this.config.tableName, SqlCompiler.modelsToValuesBucket(this.entityCls, entities))
+
+    const valuesBucket = SqlCompiler.modelsToValuesBucket(this.entityCls, entities)
+
+    if (valuesBucket && valuesBucket.length > 0) {
+      return await db.batchInsert(this.config.tableName, valuesBucket)
+    }
+
+    this.database.extension.log?.e(this.TAG, `batch insert empty values bucket`)
+
+    return Promise.resolve(0)
   }
 
 
