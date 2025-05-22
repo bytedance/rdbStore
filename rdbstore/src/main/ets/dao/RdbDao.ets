@@ -284,7 +284,8 @@ export class RdbDao<Entity extends object> {
     }
     const db = await this.database.getRdbImpl()
     const values = SqlCompiler.modelToValuesBucket(this.entityCls, entity)
-    return db.insert(this.config.tableName, values, conflict)
+    const result = await db.insert(this.config.tableName, values, conflict)
+    return result
   }
 
   /**
