@@ -518,11 +518,11 @@ export default function abilityTest() {
     it('defaultColumnName', 0, async (done:Function) => {
       dao21 = await db.getDao(SampleEntity21)
       let columns = await dao21.getAllColumns()
-      expect(columns.includes('id')).assertEqual(true);
-      expect(columns.includes('age')).assertEqual(true);
-      expect(columns.includes('name')).assertEqual(true);
-      expect(columns.includes('bigId')).assertEqual(true);
-      done();
+      expect(columns.includes('id')).assertEqual(true)
+      expect(columns.includes('age')).assertEqual(true)
+      expect(columns.includes('name')).assertEqual(true)
+      expect(columns.includes('bigId')).assertEqual(true)
+      done()
     })
   })
 }
