@@ -44,6 +44,7 @@ import {
   SampleEntity19,
   SampleEntity2,
   SampleEntity20,
+  SampleEntity21,
   SampleEntity3,
   SampleEntity4,
   SampleEntity5,
@@ -90,6 +91,7 @@ export default function abilityTest() {
   let db: RdbDatabase
   let dao: RdbDao<SampleEntity>
   let dao2: RdbDao<SampleEntity2>
+  let dao21: RdbDao<SampleEntity2>
   let context: Context
   let startTime = 1
 
@@ -112,7 +114,7 @@ export default function abilityTest() {
         dbName: 'stream.db',
         entities: [SampleEntity, SampleEntity2, SampleEntity3, SampleEntity4, SampleEntity5, SampleEntity6,
           SampleEntity7, SampleEntity8, SampleEntity9, SampleEntity10,SampleEntity11, SampleEntity12, SampleEntity13, SampleEntity14, SampleEntity15, SampleEntity16, SampleEntity17,
-          SampleEntity18, SampleEntity19, SampleEntity20],
+          SampleEntity18, SampleEntity19, SampleEntity20, SampleEntity21],
         migrations: [migration1_2, migration2_4],
         encrypt: false,
         securityLevel: relationalStore.SecurityLevel.S1,
@@ -478,7 +480,7 @@ export default function abilityTest() {
 
       await db.initTask
       const tablesAfterDelete = await db.getAllTable()
-      expect(tablesAfterDelete.length).assertEqual(19)
+      expect(tablesAfterDelete.length).assertEqual(20)
 
       done()
     })
@@ -510,5 +512,17 @@ export default function abilityTest() {
     //
     //   done()
     // })
+  })
+
+  describe('feature',() => {
+    it('defaultColumnName', 0, async (done:Function) => {
+      dao21 = await db.getDao(SampleEntity21)
+      let columns = await dao21.getAllColumns()
+      expect(columns.includes('id')).assertEqual(true)
+      expect(columns.includes('age')).assertEqual(true)
+      expect(columns.includes('name')).assertEqual(true)
+      expect(columns.includes('bigId')).assertEqual(true)
+      done()
+    })
   })
 }

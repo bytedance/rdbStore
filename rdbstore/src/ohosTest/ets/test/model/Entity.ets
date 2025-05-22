@@ -589,3 +589,30 @@ export class SampleEntity20 {
   })
   child: Child = new Child()
 }
+
+/**
+ * 用于Columns装饰器name属性缺省单元测试
+ */
+@Entity({
+  tableName: 'SampleEntity21',
+  index: [{ name: 'SampleEntity21idIndex', columnName: ['age', 'id'] }]
+})
+export class SampleEntity21 {
+  @Columns({
+    type: ColumnType.INTEGER,
+    isPrimaryKey: true,
+    autoincrement: true
+  })
+  id: number | null = null;
+  @Columns({ type: ColumnType.INTEGER })
+  age: number = -1
+  @Columns({ type: ColumnType.TEXT })
+  name: string = ''
+  @Columns({ type: ColumnType.TEXT, convertor: BigIntToStringConvertor })
+  bigId: bigint = 1n
+  @Embedded({
+    prefix: '',
+    targetClass: Child
+  })
+  child: Child = new Child()
+}
