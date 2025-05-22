@@ -158,7 +158,7 @@ export namespace Weave {
       }
 
       const prop =
-        new Property(table.tableName, columnInfo.type, propName, columnInfo.isPrimaryKey ?? false, columnInfo.name,
+        new Property(table.tableName, columnInfo.type, propName, columnInfo.isPrimaryKey ?? false, columnInfo.name!,
           columnInfo.autoincrement ?? false, embeddedChain,
           columnInfo.convertor ? new ConvertParameter(columnInfo.convertor, columnInfo.type) : undefined,
           new Constraint(columnInfo.unique ?? false, columnInfo.notNull ?? false));

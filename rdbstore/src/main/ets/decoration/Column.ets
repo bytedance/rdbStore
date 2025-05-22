@@ -26,6 +26,7 @@ import { ColumnType } from './ColumnType';
  */
 export function Columns(info: ColumnInfo): PropertyDecorator {
   return (target: object, propertyKey) => {
+    info.name = info.name ?? propertyKey.toString();
     const columnMeta: object = target[RdbConst.COLUMN] ?? new Object
     if ((typeof propertyKey === 'string')) {
       columnMeta[propertyKey] = info
@@ -41,7 +42,7 @@ export interface ColumnInfo {
   /**
    * 列名
    */
-  name: string
+  name?: string
   /**
    * 列类型
    */
