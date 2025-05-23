@@ -45,6 +45,8 @@ import {
   SampleEntity2,
   SampleEntity20,
   SampleEntity21,
+  SampleEntity22,
+  SampleEntity23,
   SampleEntity3,
   SampleEntity4,
   SampleEntity5,
@@ -94,7 +96,10 @@ export default function abilityTest() {
   let dao21: RdbDao<SampleEntity2>
   let context: Context
   let startTime = 1
-
+  let entities = [SampleEntity, SampleEntity2, SampleEntity3, SampleEntity4, SampleEntity5, SampleEntity6,
+    SampleEntity7, SampleEntity8, SampleEntity9, SampleEntity10, SampleEntity11, SampleEntity12, SampleEntity13,
+    SampleEntity14, SampleEntity15, SampleEntity16, SampleEntity17, SampleEntity18, SampleEntity19, SampleEntity20,
+    SampleEntity21, SampleEntity22, SampleEntity23];
   beforeAll(async () => {
     //start tested ability
     const want: Want = {
@@ -112,9 +117,7 @@ export default function abilityTest() {
       db = Rdb.databaseBuilder(context, {
         version: 1,
         dbName: 'stream.db',
-        entities: [SampleEntity, SampleEntity2, SampleEntity3, SampleEntity4, SampleEntity5, SampleEntity6,
-          SampleEntity7, SampleEntity8, SampleEntity9, SampleEntity10,SampleEntity11, SampleEntity12, SampleEntity13, SampleEntity14, SampleEntity15, SampleEntity16, SampleEntity17,
-          SampleEntity18, SampleEntity19, SampleEntity20, SampleEntity21],
+        entities,
         migrations: [migration1_2, migration2_4],
         encrypt: false,
         securityLevel: relationalStore.SecurityLevel.S1,
@@ -187,7 +190,7 @@ export default function abilityTest() {
       model3.age = 100
       model2.name = 'batch'
       model.name = 'batch-insert'
-      await dao.batchInsert([model,model, model2, model3])
+      await dao.batchInsert([model, model, model2, model3])
       const list = await dao.queryAll()
       const model1 = list.find(item => {
         return item.id == 1
@@ -480,7 +483,7 @@ export default function abilityTest() {
 
       await db.initTask
       const tablesAfterDelete = await db.getAllTable()
-      expect(tablesAfterDelete.length).assertEqual(20)
+      expect(tablesAfterDelete.length).assertEqual(entities.length - 1)
 
       done()
     })
@@ -514,14 +517,26 @@ export default function abilityTest() {
     // })
   })
 
-  describe('feature',() => {
-    it('defaultColumnName', 0, async (done:Function) => {
+  describe('feature', () => {
+    it('defaultColumnName', 0, async (done: Function) => {
       dao21 = await db.getDao(SampleEntity21)
       let columns = await dao21.getAllColumns()
       expect(columns.includes('id')).assertEqual(true)
       expect(columns.includes('age')).assertEqual(true)
       expect(columns.includes('name')).assertEqual(true)
       expect(columns.includes('bigId')).assertEqual(true)
+      done()
+    })
+
+    it('defaultTableName', 0, async (done: Function) => {
+      let dao22 = await db.getDao(SampleEntity22)
+      expect(dao22.config.tableName).assertEqual('SampleEntity22')
+      done()
+    })
+
+    it('tableDecorator', 0, async (done: Function) => {
+      let dao23 = await db.getDao(SampleEntity23)
+      expect(dao23.config.tableName).assertEqual('SampleEntity23')
       done()
     })
   })
