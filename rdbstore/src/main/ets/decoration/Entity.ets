@@ -18,6 +18,17 @@ import { PropertyConverter } from '../model/relation/converter/ConvertParameter'
 import { RdbConst } from '../RdbConst';
 
 /**
+ * 表注解，无需传入参数
+ * @param target
+ */
+export function Table(target: object) {
+  let tableInfo: TableInfo = {
+    tableName: target['name']
+  }
+  target[RdbConst.TABLE] = tableInfo
+}
+
+/**
  * 表注解
  * @param tableInfo
  * @returns
