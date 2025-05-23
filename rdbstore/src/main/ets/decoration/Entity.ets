@@ -18,12 +18,26 @@ import { PropertyConverter } from '../model/relation/converter/ConvertParameter'
 import { RdbConst } from '../RdbConst';
 
 /**
+ * 表注解，无需传入参数
+ * @param target
+ */
+export function Table(target: object) {
+  let tableInfo: TableInfo = {
+    tableName: target['name']
+  }
+  target[RdbConst.TABLE] = tableInfo
+}
+
+/**
  * 表注解
  * @param tableInfo
  * @returns
  */
-export function Entity(tableInfo: TableInfo): ClassDecorator {
+export function Entity(tableInfo: TableInfo = {}): ClassDecorator {
   return (target: object) => {
+    if (tableInfo.tableName === undefined) {
+      tableInfo.tableName = target['name']
+    }
     target[RdbConst.TABLE] = tableInfo
   };
 }
@@ -34,8 +48,9 @@ export function Entity(tableInfo: TableInfo): ClassDecorator {
 export interface TableInfo {
   /**
    * 表名
+   * @default 被装饰的类名
    */
-  tableName: string
+  tableName?: string
   /**
    * 索引信息
    */
