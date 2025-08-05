@@ -48,7 +48,7 @@ export namespace Weave {
    */
   function generatePropertyInfo(tableInfo: TableInfo, entityCls: ClassConstructor<Object>) {
     const tableMeta = new TableMetaInfo()
-    tableMeta.tableName = tableInfo.tableName
+    tableMeta.tableName = tableInfo.tableName!
     tableMeta.entityCls = entityCls
     tableMeta.index =
       tableInfo.index?.map((item) => new IndexMetaInfo(item.name, item.columnName, item.unique)) ?? new Array
@@ -115,8 +115,10 @@ export namespace Weave {
    */
   function ignoreNode(entityCls: ClassConstructor<Object>, propName: string) {
     if (propName) {
-      const columnInfo: ColumnInfo = entityCls.prototype[RdbConst.COLUMN] ? entityCls.prototype[RdbConst.COLUMN][propName] : undefined
-      const embedded: EmbeddedInfo<Object> = entityCls.prototype[RdbConst.EMBEDDED] ? entityCls.prototype[RdbConst.EMBEDDED][propName] : undefined
+      const columnInfo: ColumnInfo =
+        entityCls.prototype[RdbConst.COLUMN] ? entityCls.prototype[RdbConst.COLUMN][propName] : undefined
+      const embedded: EmbeddedInfo<Object> =
+        entityCls.prototype[RdbConst.EMBEDDED] ? entityCls.prototype[RdbConst.EMBEDDED][propName] : undefined
       if (!columnInfo && !embedded) {
         return true
       }

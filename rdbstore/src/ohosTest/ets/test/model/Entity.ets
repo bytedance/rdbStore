@@ -18,6 +18,7 @@ import {
   BigIntToStringConvertor,
   Columns,
   ColumnType,
+  Table,
   Embedded,
   Entity
 } from '../../../../../Index';
@@ -80,16 +81,13 @@ export class SampleEntity {
     targetClass: Child
   })
   child: Child = new Child()
-
   paramInt: number = 1
-
   child2: Child = new Child()
 }
 
 
 export class Sample extends SampleEntity {
 }
-
 
 
 @Entity({
@@ -149,7 +147,6 @@ export class SampleEntity3 {
 }
 
 
-
 @Entity({
   tableName: 'SampleEntity4',
   index: [{ name: 'SampleEntity4idIndex', columnName: ['age', 'id'] }]
@@ -200,7 +197,6 @@ export class SampleEntity5 {
   })
   child: Child = new Child()
 }
-
 
 
 @Entity({
@@ -255,7 +251,6 @@ export class SampleEntity7 {
 }
 
 
-
 @Entity({
   tableName: 'SampleEntity8',
   index: [{ name: 'SampleEntity8idIndex', columnName: ['age', 'id'] }]
@@ -306,7 +301,6 @@ export class SampleEntity9 {
   })
   child: Child = new Child()
 }
-
 
 
 @Entity({
@@ -361,7 +355,6 @@ export class SampleEntity11 {
 }
 
 
-
 @Entity({
   tableName: 'SampleEntity12',
   index: [{ name: 'SampleEntity12idIndex', columnName: ['age', 'id'] }]
@@ -412,7 +405,6 @@ export class SampleEntity13 {
   })
   child: Child = new Child()
 }
-
 
 
 @Entity({
@@ -598,6 +590,54 @@ export class SampleEntity20 {
   index: [{ name: 'SampleEntity21idIndex', columnName: ['age', 'id'] }]
 })
 export class SampleEntity21 {
+  @Columns({
+    type: ColumnType.INTEGER,
+    isPrimaryKey: true,
+    autoincrement: true
+  })
+  id: number | null = null;
+  @Columns({ type: ColumnType.INTEGER })
+  age: number = -1
+  @Columns({ type: ColumnType.TEXT })
+  name: string = ''
+  @Columns({ type: ColumnType.TEXT, convertor: BigIntToStringConvertor })
+  bigId: bigint = 1n
+  @Embedded({
+    prefix: '',
+    targetClass: Child
+  })
+  child: Child = new Child()
+}
+
+/**
+ * 用于Entity装饰器tableName属性缺省单元测试
+ */
+@Entity()
+export class SampleEntity22 {
+  @Columns({
+    type: ColumnType.INTEGER,
+    isPrimaryKey: true,
+    autoincrement: true
+  })
+  id: number | null = null;
+  @Columns({ type: ColumnType.INTEGER })
+  age: number = -1
+  @Columns({ type: ColumnType.TEXT })
+  name: string = ''
+  @Columns({ type: ColumnType.TEXT, convertor: BigIntToStringConvertor })
+  bigId: bigint = 1n
+  @Embedded({
+    prefix: '',
+    targetClass: Child
+  })
+  child: Child = new Child()
+}
+
+/**
+ * 用于Table装饰器tableName属性缺省单元测试
+ */
+@Table
+export class SampleEntity23 {
   @Columns({
     type: ColumnType.INTEGER,
     isPrimaryKey: true,
