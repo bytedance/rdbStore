@@ -96,15 +96,15 @@ export class RdbOpenHelper {
             rdbStore.version = this.database.config.version
           } else {
             // 升级
-            rdbStore.beginTransaction();
-            await this.onUpgrade(rdbStore, this.database, version, this.database.config.version);
-            rdbStore.version = this.database.config.version;
-            rdbStore.commit();
+            const success = await this.onUpgrade(rdbStore, this.database, version, this.database.config.version);
+            if (success) {
+              rdbStore.version = this.database.config.version;
+            } else {
+              this.database.extension.log?.e(Rdb.ErrorMsg.INIT_ERROR, `upgrade error from ${version} to ${this.database.config.version}`)
+            }
           }
-
         } catch (e) {
           this.database.extension.log?.e(Rdb.ErrorMsg.INIT_ERROR, `getWriteDb error ${JSON.stringify(e)}`)
-          rdbStore.rollBack()
         }
       }
     }
@@ -114,7 +114,6 @@ export class RdbOpenHelper {
 
     // 上报初始化耗时
     this.database.monitor.eventInit(startTime)
-
 
     return rdbStore;
   }
@@ -129,14 +128,17 @@ export class RdbOpenHelper {
     await database.extension.openListener?.onDowngrade(db, database);
   }
 
-  async onUpgrade(db: relationalStore.RdbStore, database: RdbDatabase, version: number, newVersion: number) {
-    await this.openDelegate.onUpgrade(db, database, version, newVersion)
+  async onUpgrade(db: relationalStore.RdbStore, database: RdbDatabase, version: number,
+    newVersion: number): Promise<boolean> {
+    const success = await this.openDelegate.onUpgrade(db, database, version, newVersion)
     await database.extension.openListener?.onUpgrade(db, database, version, newVersion)
+    return success
   }
 
-  async onCreate(db: relationalStore.RdbStore, database: RdbDatabase) {
-    await this.openDelegate.onCreate(db, database)
+  async onCreate(db: relationalStore.RdbStore, database: RdbDatabase): Promise<boolean> {
+    const success = await this.openDelegate.onCreate(db, database)
     await database.extension.openListener?.onCreate(db, database)
+    return success
   }
 
   /**

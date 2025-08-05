@@ -458,7 +458,6 @@ export default function abilityTest() {
         .build()
 
       await db.initTask
-      const dao2 = new RdbDao(db, SampleEntity2)
       const colmn2 = await dao.getAllColumns()
       const index2 = await dao.getAllIndex()
 

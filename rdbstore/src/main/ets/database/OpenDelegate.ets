@@ -40,7 +40,7 @@ export class OpenDelegate implements IOpenDelegate {
     return Promise.resolve(true)
   }
 
-  onConfig(database: RdbDatabase, version: number): Promise<boolean> {
+  async onConfig(database: RdbDatabase, version: number): Promise<boolean> {
 
     try {
 
@@ -65,15 +65,16 @@ export class OpenDelegate implements IOpenDelegate {
       }
 
     } catch (e) {
-      return Promise.resolve(false)
+      database.extension.log?.e(this.tag, `onConfig error: ${e.name} ${e.message}`)
+      return false
     }
 
-    return Promise.resolve(true)
+    return true
   }
 
   async onDowngrade(db: relationalStore.RdbStore, database: RdbDatabase): Promise<boolean> {
     database.extension.log?.e(this.tag, `onDowngrade: ${database.config.dbName}`)
-    return Promise.resolve(false)
+    return false
   }
 
   async onUpgrade(db: relationalStore.RdbStore, database: RdbDatabase, version: number,
@@ -97,17 +98,17 @@ export class OpenDelegate implements IOpenDelegate {
             `Migration: done from: ${migrations_item.preVersion}, to: ${migrations_item.toVersion}`)
         }
         db.commit()
-        return Promise.resolve(true)
+        return true
       } else {
-        database.extension.log?.e(this.tag,
-          `Migration: done from: ${version}, to: ${newVersion}`)
+        database.extension.log?.w(this.tag,
+          `Migration: missing migrations from: ${version}, to: ${newVersion}`)
       }
     } catch (e) {
       database.extension.log?.e(this.tag,
-        `Migration: error ! ${e}`)
+        `Migration: error ! ${e.name} ${e.message}`)
       db.rollBack()
     }
-    return Promise.resolve(false)
+    return false
   }
 
   async onCreate(db: relationalStore.RdbStore, database: RdbDatabase): Promise<boolean> {
@@ -115,24 +116,37 @@ export class OpenDelegate implements IOpenDelegate {
 
     const entities = DbStructInfo.getInstance().getEntites(database.config.dbName)
     if (!(entities && entities.length > 0)) {
-      return Promise.resolve(false)
+      database.extension.log?.w(this.tag, `${database.config.dbName}: no valid table to create`)
+      return false
     }
 
-    // 遍历所有实体表
-    for (const element of entities) {
+    try {
+      db.beginTransaction()
 
-      // 创建所有表
-      const sql: string = SqlCompiler.getTableCreateSql(element)
-      database.extension.log?.i(this.tag, `${database.config.dbName}: onCreate excute sql: ${sql}`)
-      await db.executeSql(sql)
+      // 遍历所有实体表
+      for (const element of entities) {
 
-      // 创建所有索引
-      const indexes: Array<string> = SqlCompiler.getTableIndexSql(element)
-      for (const sql of indexes) {
+        // 创建所有表
+        const sql: string = SqlCompiler.getTableCreateSql(element)
         database.extension.log?.i(this.tag, `${database.config.dbName}: onCreate excute sql: ${sql}`)
         await db.executeSql(sql)
+
+        // 创建所有索引
+        const indexes: Array<string> = SqlCompiler.getTableIndexSql(element)
+        for (const sql of indexes) {
+          database.extension.log?.i(this.tag, `${database.config.dbName}: onCreate excute sql: ${sql}`)
+          await db.executeSql(sql)
+        }
       }
+
+      // 创建成功
+      db.commit()
+      return true
+
+    } catch (e) {
+      db.rollBack()
     }
-    return Promise.resolve(true)
+
+    return false
   }
 }

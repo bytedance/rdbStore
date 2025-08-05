@@ -33,9 +33,9 @@ export namespace DiffUtil {
   /**
    * 计算 && 填充 自动升级的 migration
    * 自动计算：
-   * 表增加、表删除
+   * 表增加、表删除（使用自动升级时观察删除的表是否符合预期）
    * 索引增加、索引删除
-   * 列增加、列输出
+   * 列增加、列删除
    * @param migration
    * @param database
    */
@@ -137,8 +137,7 @@ export namespace DiffUtil {
     result.forEach(item => {
       switch (item.op) {
         case DiffOps.ADD:
-          migration.addColumn(tableName, item.data.columnName, item.data.type, item.data.constraint?.unique,
-            item.data.constraint?.notNull)
+          migration.addColumn(tableName, item.data.columnName, item.data.type)
           break;
         case DiffOps.DELETE:
           migration.deleteColumn(tableName, item.data.columnName)
@@ -208,7 +207,7 @@ export namespace DiffUtil {
    */
   async function getDiffCurrentAllTable(database: relationalStore.RdbStore): Promise<Array<TableMetaInfo>> {
     const tables: Array<TableMetaInfo> = new Array
-    const result = await database.querySql('SELECT name FROM sqlite_master WHERE type = "table" AND name NOT LIKE "sqlite_%" ')
+    const result = await database.querySql('SELECT name FROM sqlite_master WHERE type = "table" AND name NOT LIKE "sqlite_%" AND name NOT LIKE "naturalbase_rdb_%" ')
     if (result) {
       while (result.goToNextRow()) {
         const table: TableMetaInfo = new TableMetaInfo()

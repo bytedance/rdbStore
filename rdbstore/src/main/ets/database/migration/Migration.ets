@@ -54,13 +54,14 @@ export class Migration {
   /**
    * 新增列操作(需要新增的列名以及列数据类型名称,返回当前类实例)
    */
-  addColumn(table: string, columnName: string, columnType: ColumnType, unique = false, notNull = false): Migration {
+  addColumn(table: string, columnName: string, columnType: ColumnType, notNull = false, unique = false,
+    defaultValue: undefined | string | number = undefined): Migration {
     let columnSql = `ALTER TABLE ${table} ADD ${columnName} ${columnType}`;
     if (unique) {
       columnSql = columnSql + ' UNIQUE '
     }
-    if (notNull) {
-      columnSql = columnSql + ' NOT NULL'
+    if (notNull && defaultValue != undefined) {
+      columnSql = columnSql + ' NOT NULL DEFAULT ' + defaultValue
     }
     this.sqlArray.push(columnSql)
     return this;
