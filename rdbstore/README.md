@@ -9,13 +9,16 @@
 
 仓库地址：https://github.com/bytedance/rdbStore
 
+开发者文档：https://bytedance.larkoffice.com/docx/DpWgdGf5toJK7PxLSwdcC8r7nZg
+
 # 接入
 
  ```
 ohpm install rdbstore
  ```
 
-更多技术支持: 邮件 gongshijie.gongsj@bytedance.com
+更多技术支持 -> 社区：https://qm.qq.com/q/AQDkBz1MOs
+
 
 # 能力简介
 
