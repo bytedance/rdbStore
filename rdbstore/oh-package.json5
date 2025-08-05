@@ -1,6 +1,6 @@
 {
   "name": "rdbstore",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "字节跳动鸿蒙生态数据库组件，支撑字节系鸿蒙应用数据库相关能力。",
   "keywords": [
     '数据库',
