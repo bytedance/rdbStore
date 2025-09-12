@@ -30,6 +30,7 @@ export function Columns(info: ColumnInfo): PropertyDecorator {
     const columnMeta: object = target[RdbConst.COLUMN] ?? new Object
     if ((typeof propertyKey === 'string')) {
       columnMeta[propertyKey] = info
+      columnMeta["__ob_" + propertyKey] = info
     }
     target[RdbConst.COLUMN] = columnMeta
   };

@@ -136,7 +136,7 @@ export namespace SqlCompiler {
             columnBindValue(values, property, innerTargetModel)
           }
         } else {
-          if (entity[property.name] != undefined) {
+          if (entity[property.name] != undefined && !property.autoincrement) {
             columnBindValue(values, property, entity)
           }
         }
@@ -144,7 +144,6 @@ export namespace SqlCompiler {
     }
     return values
   }
-
 
   /**
    * 批量完成查询结果解析
