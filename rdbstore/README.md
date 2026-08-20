@@ -202,6 +202,8 @@ TuneDbParamPlugin#setJournalSizeLimit
 
 > 推荐开启自动升级，之后只需要修改版本号即可，无需手写 Migration
 
+> 自动升级默认不会生成删除列（drop column）的 sql，如需在自动升级时删除实体中已移除的列，配置 autoMigrateDropColumn: true 开启
+
 通过配置 migration 进行升级
 
 ```
@@ -215,7 +217,8 @@ entities: [SampleEntity],
 migrations: [migration1_2, migration2_4],
 encrypt: false,
 securityLevel: relationalStore.SecurityLevel.S1,
-autoMigrate: false
+autoMigrate: false,
+autoMigrateDropColumn: false
 }).setLogger(new DBLog())
 .setEvent(new DBEventSender())
 .build()

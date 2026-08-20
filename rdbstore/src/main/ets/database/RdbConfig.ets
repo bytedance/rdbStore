@@ -52,6 +52,10 @@ export interface RdbConfig {
    */
   autoMigrate: boolean
   /**
+   * 自动升级时是否允许生成删除列（drop column）的 sql，默认关闭；开启后，实体中已移除的列会自动生成 DROP COLUMN 语句
+   */
+  autoMigrateDropColumn?: boolean
+  /**
    * 从某个版本开始废弃低版本数据库，重新创建
    * 比如配置：5，会删除数据库版本为 1 2 3 4 这些版本数据库
    */

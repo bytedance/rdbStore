@@ -38,8 +38,10 @@ export namespace DiffUtil {
    * 列增加、列删除
    * @param migration
    * @param database
+   * @param allowDropColumn 是否允许生成删除列（drop column）的 sql，默认关闭
    */
-  export async function fillAutoUpgradeMigration(migration: Migration, database: relationalStore.RdbStore) {
+  export async function fillAutoUpgradeMigration(migration: Migration, database: relationalStore.RdbStore,
+    allowDropColumn: boolean = false) {
     const diffResult: Array<DiffResult<Object>> = new Array
     const newTables = Array.from(DbStructInfo.getInstance().tableMap.values())
     const newTableName = new Set(newTables.map((item) => item.tableName))
@@ -70,7 +72,7 @@ export namespace DiffUtil {
       const propDiff = calculateDiff(DiffType.COLUMN, props,
         DbStructInfo.getInstance().getPropsByName(table.tableName))
       diffResult.push(...propDiff)
-      fillColumnMigration(migration, table.tableName, propDiff)
+      fillColumnMigration(migration, table.tableName, propDiff, allowDropColumn)
     }
   }
 
@@ -132,15 +134,19 @@ export namespace DiffUtil {
 
   /**
    * 填充所有涉及列相关自动升级
+   * @param allowDropColumn 是否允许生成删除列（drop column）的 sql，默认关闭
    */
-  function fillColumnMigration(migration: Migration, tableName: string, result: Array<DiffResult<Property>>) {
+  function fillColumnMigration(migration: Migration, tableName: string, result: Array<DiffResult<Property>>,
+    allowDropColumn: boolean = false) {
     result.forEach(item => {
       switch (item.op) {
         case DiffOps.ADD:
           migration.addColumn(tableName, item.data.columnName, item.data.type)
           break;
         case DiffOps.DELETE:
-          migration.deleteColumn(tableName, item.data.columnName)
+          if (allowDropColumn) {
+            migration.deleteColumn(tableName, item.data.columnName)
+          }
           break;
       }
     })
