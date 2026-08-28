@@ -518,6 +518,20 @@ export class RdbDao<Entity extends object> {
   }
 
   /**
+   * 根据谓词查询匹配的数据行数
+   */
+  public async count(predicates: relationalStore.RdbPredicates): Promise<number> {
+    const db = await this.database.getRdbImpl()
+    const result = await db.query(predicates, ['count(*)'], 'count', this.config.tableName)
+    let count = 0
+    if (result.goToNextRow()) {
+      count = result.getRow()['count(*)'] as number
+    }
+    result.close()
+    return count
+  }
+
+  /**
    * 查询数据库中列数量
    */
   async getCount(): Promise<number> {

@@ -39,6 +39,15 @@ export class Query<Entity extends object> {
   }
 
   /**
+   * 只获取匹配的数据行数，不获取内容
+   * @returns
+   */
+  count(): Promise<number> {
+    this.dao.database.extension.log?.d(this.tag, `query count: table: ${this.dao.config.tableName} do query predicates: ${this._predicateDesc}`)
+    return this.dao.count(this.predicates)
+  }
+
+  /**
    * 谓词描述
    * @returns
    */

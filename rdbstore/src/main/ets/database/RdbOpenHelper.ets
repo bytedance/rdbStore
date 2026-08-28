@@ -64,7 +64,8 @@ export class RdbOpenHelper {
         const autoMigration = new Migration(rdbStore.version, this.database.config.version)
 
         // 计算且填充自动升级 migration
-        await DiffUtil.fillAutoUpgradeMigration(autoMigration, rdbStore)
+        await DiffUtil.fillAutoUpgradeMigration(autoMigration, rdbStore,
+          this.database.config.autoMigrateDropColumn ?? false)
 
         this.database.config.migrations.push(autoMigration)
       }
